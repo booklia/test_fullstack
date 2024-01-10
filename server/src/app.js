@@ -2,6 +2,7 @@ const express = require("express");
 
 const userRouter = require("./routes/user");
 const orderRouter = require("./routes/order");
+const dashboardRouter = require("./routes/dashboard");
 
 const app = express();
 const port = 3001;
@@ -17,6 +18,7 @@ app.use(express.json());
 app.use(allowCrossDomain);
 app.use("/", userRouter);
 app.use("/", orderRouter);
+app.use("/", dashboardRouter);
 
 app.listen(port, () => {
   console.log(`server running at https://localhost:${port}`);
