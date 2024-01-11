@@ -1,12 +1,12 @@
-const sequelize = require("../sequelizeConfig");
 const Order = require("../models/order");
 const postOrder = async (req, res) => {
   try {
-    const { user_id, order_amount, order_date } = req.body;
+    const { user_id, order_amount, order_date, order_comment } = req.body;
     const order = await Order.create({
       user_id,
       order_amount,
       order_date,
+      order_comment,
     });
     res.status(200);
     res.json(order);
@@ -34,7 +34,7 @@ const getAllOrders = async (req, res) => {
 const changeOrderById = async (req, res) => {
   try {
     const orderId = req.params.id;
-    const { user_id, order_amount, order_date } = req.body;
+    const { user_id, order_amount, order_date, order_comment } = req.body;
     const order = await Order.findByPk(orderId);
     if (!order) {
       res.status(404);
@@ -43,6 +43,8 @@ const changeOrderById = async (req, res) => {
       order.user_id = user_id || order.user_id;
       order.order_amount = order_amount || order.order_amount;
       order.order_date = order_date || order.order_date;
+      order.order_comment = order_comment || order.order_comment;
+
       await order.save();
       res.status(200);
       res.json(order);

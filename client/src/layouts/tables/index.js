@@ -35,28 +35,36 @@ function Tables() {
   const [ordersRowData, setOrdersRowData] = useState([]);
   const [ordersColDefs, setOrdersColDefs] = useState([]);
   const [usersColDefs, setUsersColDefs] = useState([]);
-
+  const [errorStatus, setErrorStatus] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
   useEffect(() => {
     (async () => {
-      const responseOrders = await fetch("http://localhost:3001/orders");
-      const responseUser = await fetch(
-        "http://localhost:3001/users?page=1&perPage=1"
-      );
-      const orders = await responseOrders.json();
-      const user = await responseUser.json();
-      if (orders && user.users) {
-        setOrdersColDefs(Object.keys(orders[0]).map((el) => ({ field: el })));
-        setOrdersRowData(
-          orders.map((el) => ({
-            ...el,
-            order_date: el.order_date
-              ? el.order_date.split("T")[0]
-              : el.order_date,
-          }))
+      try {
+        const responseOrders = await fetch("http://localhost:3001/orders");
+        const responseUser = await fetch(
+          "http://localhost:3001/users?page=1&perPage=1"
         );
-        setUsersColDefs(
-          Object.keys(user.users[0]).map((el) => ({ field: el }))
-        );
+        const orders = await responseOrders.json();
+        const user = await responseUser.json();
+
+        if (orders.length && user.users?.length) {
+          setOrdersColDefs(Object.keys(orders[0]).map((el) => ({ field: el })));
+          setOrdersRowData(
+            orders.map((el) => ({
+              ...el,
+              order_date: el.order_date
+                ? el.order_date.split("T")[0]
+                : el.order_date,
+            }))
+          );
+          setUsersColDefs(
+            Object.keys(user.users[0]).map((el) => ({ field: el }))
+          );
+        }
+      } catch (e) {
+        console.log(e);
+        setErrorStatus(true);
+        setErrorMessage({ error: "Couldn't load data" });
       }
     })();
   }, []);
@@ -65,25 +73,31 @@ function Tables() {
     const dataSource = {
       rowCount: undefined,
       getRows: async (params) => {
-        const responseUsers = await fetch(
-          `http://localhost:3001/users?page=${
-            Math.floor(params.startRow / 5) + 1
-          }&perPage=5`
-        );
-        const data = await responseUsers.json();
-        if (data.users) {
-          data.users = data.users.map((el) => ({
-            ...el,
-            registration_date: el.registration_date
-              ? el.registration_date.split("T")[0]
-              : el.registration_date,
-          }));
+        try {
+          const responseUsers = await fetch(
+            `http://localhost:3001/users?page=${
+              Math.floor(params.startRow / 5) + 1
+            }&perPage=5`
+          );
+          const data = await responseUsers.json();
+          if (data.users) {
+            data.users = data.users.map((el) => ({
+              ...el,
+              registration_date: el.registration_date
+                ? el.registration_date.split("T")[0]
+                : el.registration_date,
+            }));
+          }
+          let lastRow = -1;
+          if (data.meta.totalItems < params.endRow - params.startRow) {
+            lastRow = data.users.length + params.startRow;
+          }
+          params.successCallback(data.users, lastRow);
+        } catch (e) {
+          console.log(e);
+          setErrorStatus(true);
+          setErrorMessage({ error: "Couldn't load data" });
         }
-        let lastRow = -1;
-        if (data.meta.totalItems < params.endRow - params.startRow) {
-          lastRow = data.users.length + params.startRow;
-        }
-        params.successCallback(data.users, lastRow);
       },
     };
     params.api.setGridOption("datasource", dataSource);
@@ -113,6 +127,10 @@ function Tables() {
                 <OperationsComponent
                   setOrders={setOrdersRowData}
                   orders={ordersRowData}
+                  errorStatus={errorStatus}
+                  setErrorStatus={setErrorStatus}
+                  errorMessage={errorMessage}
+                  setErrorMessage={errorMessage}
                 />
                 <div className="ag-theme-quartz" style={{ height: 250 }}>
                   <AgGridReact

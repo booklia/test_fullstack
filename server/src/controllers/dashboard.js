@@ -3,15 +3,27 @@ const sequelize = require("../sequelizeConfig");
 const getDashboardInfo = async (req, res) => {
   try {
     const { date } = req.query;
+    let startDate;
+    let endDate;
+    if (date) {
+      endDate = new Date();
+      startDate = new Date(endDate);
+      startDate.setDate(endDate.getDate() - 7);
+      startDate = startDate.toISOString();
+      endDate = endDate.toISOString();
+    } else {
+      startDate = "2022-04-01";
+      endDate = "2022-04-07";
+    }
     const [ordersCountWeek] = await sequelize.query(
       `
           SELECT
             COUNT(id) AS order_count
           FROM orders
-          WHERE order_date BETWEEN '2022-04-01' AND '2022-04-07'
+          WHERE order_date BETWEEN :startDate AND :endDate
           `,
       {
-        replacements: { date },
+        replacements: { startDate, endDate },
       }
     );
     const [usersCountMadeOrders] = await sequelize.query(
@@ -19,10 +31,10 @@ const getDashboardInfo = async (req, res) => {
           SELECT
             COUNT(DISTINCT user_id) AS user_count
           FROM orders
-          WHERE order_date BETWEEN '2022-04-01' AND '2022-04-07';
+          WHERE order_date BETWEEN :startDate AND :endDate
           `,
       {
-        replacements: { date },
+        replacements: { startDate, endDate },
       }
     );
     const [revenue] = await sequelize.query(
@@ -30,10 +42,10 @@ const getDashboardInfo = async (req, res) => {
           SELECT
             SUM(order_amount) AS total_profit
           FROM orders
-          WHERE order_date BETWEEN '2022-04-01' AND '2022-04-07'
+          WHERE order_date BETWEEN :startDate AND :endDate
           `,
       {
-        replacements: { date },
+        replacements: { startDate, endDate },
       }
     );
     const [revenueDaily] = await sequelize.query(
@@ -42,12 +54,12 @@ const getDashboardInfo = async (req, res) => {
             DATE(order_date) AS order_day,
             SUM(order_amount) AS daily_profit
           FROM orders
-          WHERE order_date BETWEEN '2022-04-01' AND '2022-04-07'
+          WHERE order_date BETWEEN :startDate AND :endDate
           GROUP BY order_day
           ORDER BY order_day;
           `,
       {
-        replacements: { date },
+        replacements: { startDate, endDate },
       }
     );
     const [usersDaily] = await sequelize.query(
@@ -57,12 +69,12 @@ const getDashboardInfo = async (req, res) => {
             COUNT(DISTINCT users.id) AS user_count
           FROM orders
           JOIN users ON orders.user_id = users.id
-          WHERE order_date BETWEEN '2022-04-01' AND '2022-04-07'
+          WHERE order_date BETWEEN :startDate AND :endDate
           GROUP BY order_day
           ORDER BY order_day;
           `,
       {
-        replacements: { date },
+        replacements: { startDate, endDate },
       }
     );
 

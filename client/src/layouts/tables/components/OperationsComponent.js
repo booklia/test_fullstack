@@ -1,14 +1,21 @@
 import MDButton from "../../../components/MDButton";
 import MDBox from "../../../components/MDBox";
 import MDInput from "../../../components/MDInput";
-import { useState } from "react";
-import ErrorComponent from "./ErrorComponent";
+import { useEffect, useState } from "react";
+import ErrorComponent from "../../../components/ErrorComponent/ErrorComponent";
 
-function OperationsComponent({ setOrders, orders }) {
+function OperationsComponent({
+  setOrders,
+  orders,
+  errorStatus,
+  setErrorStatus,
+  errorMessage,
+  setErrorMessage,
+}) {
   const [currentAction, setCurrentAction] = useState("");
-  const [errorStatus, setErrorStatus] = useState(false);
-  const [errorMessage, setErrorMessage] = useState("");
-
+  useEffect(() => {
+    console.log(errorMessage);
+  }, [errorMessage]);
   const queries = {
     ADD: async (query) => {
       try {
@@ -144,6 +151,9 @@ function OperationsComponent({ setOrders, orders }) {
           )}
           {(currentAction === "UPDATE" || currentAction === "ADD") && (
             <MDInput name="order_amount" label="ORDER AMOUNT" />
+          )}
+          {(currentAction === "UPDATE" || currentAction === "ADD") && (
+            <MDInput name="order_comment" label="ORDER COMMENT" />
           )}
           {(currentAction === "UPDATE" || currentAction === "ADD") && (
             <MDInput name="order_date" label="ORDER DATE" />

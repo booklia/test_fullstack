@@ -3,7 +3,7 @@ const sequelize = require("../sequelizeConfig");
 
 const User = sequelize.define("user", {
   username: {
-    type: DataTypes.STRING,
+    type: DataTypes.STRING(50),
     allowNull: false,
   },
   age: {

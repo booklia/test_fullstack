@@ -12,6 +12,9 @@ const Order = sequelize.define("order", {
     type: DataTypes.INTEGER,
     allowNull: false,
   },
+  order_comment: {
+    type: DataTypes.STRING(255),
+  },
 });
 Order.belongsTo(sequelize.models.user, {
   foreignKey: "user_id",
