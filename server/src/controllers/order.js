@@ -60,7 +60,6 @@ const removeOrderById = async (req, res) => {
   try {
     const orderId = Number.parseInt(req.params.id);
     const order = await Order.findByPk(orderId);
-    console.log(order);
     if (!order) {
       res.status(404);
       res.json({ error: "Order not found" });

@@ -32,8 +32,8 @@ function Dashboard() {
   const [ordersCount, setOrders] = useState("");
   const [revenue, setRevenue] = useState("");
   const [usersOrdered, setUsersOrdered] = useState("");
-  const [salesDaily, setSalesDaily] = useState("");
-  const [usersDaily, setUsersDaily] = useState("");
+  const [salesDaily, setSalesDaily] = useState({});
+  const [usersDaily, setUsersDaily] = useState({});
 
   const [errorStatus, setErrorStatus] = useState(false);
   const [errorMessage, setErrorMessage] = useState({});
@@ -82,6 +82,11 @@ function Dashboard() {
                 icon="weekend"
                 title="Orders last week"
                 count={ordersCount}
+                percentage={{
+                  color: "success",
+                  amount: "",
+                  label: "",
+                }}
               />
             </MDBox>
           </Grid>
@@ -91,6 +96,11 @@ function Dashboard() {
                 icon="leaderboard"
                 title="Today's Users ordered"
                 count={usersOrdered}
+                percentage={{
+                  color: "success",
+                  amount: "",
+                  label: "",
+                }}
               />
             </MDBox>
           </Grid>
@@ -101,6 +111,11 @@ function Dashboard() {
                 icon="store"
                 title="Revenue"
                 count={revenue}
+                percentage={{
+                  color: "success",
+                  amount: "",
+                  label: "",
+                }}
               />
             </MDBox>
           </Grid>

@@ -1,7 +1,7 @@
 import MDButton from "../../../components/MDButton";
 import MDBox from "../../../components/MDBox";
 import MDInput from "../../../components/MDInput";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import ErrorComponent from "../../../components/ErrorComponent/ErrorComponent";
 
 function OperationsComponent({
@@ -13,9 +13,6 @@ function OperationsComponent({
   setErrorMessage,
 }) {
   const [currentAction, setCurrentAction] = useState("");
-  useEffect(() => {
-    console.log(errorMessage);
-  }, [errorMessage]);
   const queries = {
     ADD: async (query) => {
       try {
@@ -114,7 +111,6 @@ function OperationsComponent({
           const res = await queries[currentAction](query);
           if (res.status === 200) {
             const json = await res.json();
-            console.log(json);
             if (currentAction === "ADD") {
               json.order_date = json.order_date
                 ? json.order_date.split("T")[0]
